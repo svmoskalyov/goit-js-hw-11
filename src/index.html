@@ -10,13 +10,19 @@
   <body>
     <div class="container">
       <form class="search-form" id="search-form">
-        <input
-          type="text"
-          name="searchQuery"
-          autocomplete="off"
-          placeholder="Search images..."
-        />
-        <button type="submit">Search</button>
+        <div class="search-form__field">
+          <input
+            class="search-input"
+            type="text"
+            name="searchQuery"
+            autocomplete="off"
+            placeholder="Search images..."
+          />
+          <button class="search-btn" type="submit"><svg class="search-btn__icon" width="20" height="20">
+                  <use href="./images/icons.svg#search"></use>
+                </svg>
+          </button>
+        </div>
       </form>
 
       <div class="gallery">
@@ -25,7 +31,7 @@
 
       <button type="button" class="load-more">Load more</button>
     </div>
-    
+
     <script src="index.js" type="module"></script>
   </body>
 </html>
