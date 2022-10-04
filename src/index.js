@@ -4,7 +4,7 @@ import { onError, onSuccess } from './js/notify';
 import { createGalleryCards } from './js/createGalleryCards';
 
 const refs = getRefs();
-const pixabayAPI = new PixabayAPI({ perPage: 40 });
+const pixabayAPI = new PixabayAPI();
 
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onClick);
@@ -17,35 +17,27 @@ function onSubmit(e) {
   const query = searchQuery.value.trim().toLowerCase();
 
   if (!query) {
-    console.log('NO input query');
-    return;
+    return onError('You not input query.');
   }
 
   pixabayAPI.query = query;
 
-  pixabayAPI
-    .getPhotos()
-    .then(({ hits, totalHits }) => {
-      if (hits.length === 0) {
-        onError(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-        return;
-      }
+  pixabayAPI.getPhotos().then(({ data: { hits, totalHits } }) => {
+    if (hits.length === 0) {
+      return onError(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
 
-      pixabayAPI.calculateTotalPages(totalHits);
+    pixabayAPI.calculateTotalPages(totalHits);
 
-      if (pixabayAPI.isShowLoadMore) {
-        refs.loadMoreBtn.classList.remove('is-hidden');
-      }
+    if (pixabayAPI.isShowLoadMore) {
+      refs.loadMoreBtn.classList.remove('is-hidden');
+    }
 
-      addMarkup(hits);
-      onSuccess(`Hooray! We found ${totalHits} images.`);
-    })
-    .catch(error => {
-      onError(error.message);
-      clearPage();
-    });
+    addMarkup(hits);
+    onSuccess(`Hooray! We found ${totalHits} images.`);
+  });
 }
 
 function onClick() {
@@ -53,19 +45,12 @@ function onClick() {
 
   if (!pixabayAPI.isShowLoadMore) {
     refs.loadMoreBtn.classList.add('is-hidden');
-    onSuccess("We're sorry, but you've reached the end of search results.");
-    return;
+    return onSuccess("We're sorry, but you've reached the end of search results.");
   }
 
-  pixabayAPI
-    .getPhotos()
-    .then(({ hits }) => {
-      addMarkup(hits);
-    })
-    .catch(error => {
-      onError(error.message);
-      clearPage();
-    });
+  pixabayAPI.getPhotos().then(({ data: { hits } }) => {
+    addMarkup(hits);
+  });
 }
 
 function addMarkup(photos) {
@@ -78,11 +63,3 @@ function clearPage() {
   pixabayAPI.resetPage();
   refs.loadMoreBtn.classList.add('is-hidden');
 }
-
-// webformatURL - посилання на маленьке зображення для списку карток.
-// largeImageURL - посилання на велике зображення.
-// tags - рядок з описом зображення. Підійде для атрибуту alt.
-// likes - кількість лайків.
-// views - кількість переглядів.
-// comments - кількість коментарів.
-// downloads - кількість завантажень.
