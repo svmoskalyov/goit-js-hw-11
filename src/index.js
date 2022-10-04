@@ -1,9 +1,9 @@
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
 import { getRefs } from './js/getRefs';
 import { PixabayAPI } from './js/PixabayAPI';
 import { onError, onSuccess } from './js/notify';
 import { createGalleryCards } from './js/createGalleryCards';
+import { simpleLightbox } from './js/simpleLightbox';
+import { scrollPage } from './js/scrollPage';
 
 const refs = getRefs();
 const pixabayAPI = new PixabayAPI();
@@ -61,17 +61,11 @@ function addMarkup(photos) {
   const markup = createGalleryCards(photos);
   refs.galleryList.insertAdjacentHTML('beforeend', markup);
   simpleLightbox();
+  scrollPage();
 }
 
 function clearPage() {
   refs.galleryList.innerHTML = '';
   pixabayAPI.resetPage();
   refs.loadMoreBtn.classList.add('is-hidden');
-}
-
-function simpleLightbox() {
-  let lightbox = new SimpleLightbox('.gallery a', {
-    enableKeyboard: true,
-  });
-  lightbox.refresh();
 }
