@@ -1,9 +1,7 @@
 import { getRefs } from './js/getRefs';
 import { PixabayAPI } from './js/PixabayAPI';
+import { addMarkup } from './js/addMarkup';
 import { onError, onSuccess } from './js/notify';
-import { createGalleryCards } from './js/createGalleryCards';
-import { simpleLightbox } from './js/simpleLightbox';
-import { scrollPage } from './js/scrollPage';
 
 const refs = getRefs();
 const pixabayAPI = new PixabayAPI();
@@ -37,7 +35,7 @@ function onSubmit(e) {
       refs.loadMoreBtn.classList.remove('is-hidden');
     }
 
-    addMarkup(hits);
+    addMarkup(hits, refs.galleryList);
     onSuccess(`Hooray! We found ${totalHits} images.`);
   });
 }
@@ -53,15 +51,8 @@ function onClick() {
   }
 
   pixabayAPI.getPhotos().then(({ data: { hits } }) => {
-    addMarkup(hits);
+    addMarkup(hits, refs.galleryList);
   });
-}
-
-function addMarkup(photos) {
-  const markup = createGalleryCards(photos);
-  refs.galleryList.insertAdjacentHTML('beforeend', markup);
-  simpleLightbox();
-  scrollPage();
 }
 
 function clearPage() {
