@@ -1,46 +1,97 @@
-const formRef = document.querySelector('.search-form');
-const galleryRef = document.querySelector('.gallery');
-const loadBtn = document.querySelector('.load-more');
+import { getRefs } from './js/getRefs';
+import { PixabayAPI } from './js/PixabayAPI';
+import { onError, onSuccess } from './js/notify';
+import { createGalleryCards } from './js/createGalleryCards';
 
-formRef.addEventListener('submit', onSearch);
+const refs = getRefs();
+const pixabayAPI = new PixabayAPI({ perPage: 40 });
 
-function fetchImag(term) {
-  const API_KEY = '30324311-49af4374e5f205d24fc51a3b0';
-  const URL = `https://pixabay.com/api/?key=${API_KEY}&q=${term}&image_type=photo&orientation=horizontal&safesearch=true`;
+refs.form.addEventListener('submit', onSubmit);
+refs.loadMoreBtn.addEventListener('click', onClick);
 
-  return fetch(URL).then(response => {
-    if (!response.ok) {
-      throw new Error(response.status);
-    }
-    return response.json();
-  });
-}
-
-// fetchImag('cat');
-
-function onSearch(e) {
+function onSubmit(e) {
   e.preventDefault();
 
-  // const form = e.currentTarget;
-  // const searchQuery = form.elements.searchQuery.value;
   const { searchQuery } = e.currentTarget.elements;
-  const searchText = searchQuery.value;
+  clearPage();
+  const query = searchQuery.value.trim().toLowerCase();
 
-  //   if (!searchText) {
-  //       console.log('NO text input');
-  //     return;
-  //   }
+  if (!query) {
+    console.log('NO input query');
+    return;
+  }
 
-  // fetchImag(searchText);
-  fetchImag(searchText).then(data => {
-    // const totalImg = data.totalHits;
-    //  console.log('totalImg = ', totalImg);
-    // const hitsImg = data.hits.length;
-    // console.log("hitsImg = ", hitsImg)
-    //   console.log(data.hits[0]);
-    const markup = createMarkupImg(data.hits);
-    galleryRef.insertAdjacentHTML('beforeend', markup);
-  });
+  pixabayAPI.query = query;
+
+  // pixabayAPI.getPhotos().then(data => {
+  //   console.log(data);
+  // })
+
+  pixabayAPI
+    .getPhotos()
+    .then(({ hits, totalHits }) => {
+      if (hits.length === 0) {
+        onError(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+        return;
+      }
+
+      pixabayAPI.calculateTotalPages(totalHits);
+
+      if (pixabayAPI.isShowLoadMore) {
+        refs.loadMoreBtn.classList.remove('is-hidden');
+      }
+
+      addMarkup(hits);
+      onSuccess(`Hooray! We found ${totalHits} images.`);
+    })
+    .catch(error => {
+      onError(error.message);
+      clearPage();
+    });
+
+  // pixabayAPI(query);
+  // pixabayAPI(query).then(data => {
+  //   // const totalImg = data.totalHits;
+  //   //  console.log('totalImg = ', totalImg);
+  //   // const hitsImg = data.hits.length;
+  //   // console.log("hitsImg = ", hitsImg)
+  //   //   console.log(data.hits[0]);
+  //   const markup = createMarkupImg(data.hits);
+  //   refs.galleryList.insertAdjacentHTML('beforeend', markup);
+  // });
+}
+
+function onClick() {
+  pixabayAPI.incrementPage();
+
+  if (!pixabayAPI.isShowLoadMore) {
+    refs.loadMoreBtn.classList.add('is-hidden');
+    onSuccess("We're sorry, but you've reached the end of search results.");
+    return;
+  }
+
+  pixabayAPI
+    .getPhotos()
+    .then(({ hits }) => {
+      addMarkup(hits);
+    })
+    .catch(error => {
+      onError(error.message);
+      clearPage();
+    });
+}
+
+function addMarkup(photos) {
+  const markup = createGalleryCards(photos);
+  refs.galleryList.insertAdjacentHTML('beforeend', markup);
+}
+
+function clearPage() {
+  refs.galleryList.innerHTML = '';
+  pixabayAPI.resetPage();
+  refs.loadMoreBtn.classList.add('is-hidden');
 }
 
 // webformatURL - посилання на маленьке зображення для списку карток.
@@ -51,33 +102,33 @@ function onSearch(e) {
 // comments - кількість коментарів.
 // downloads - кількість завантажень.
 
-function createMarkupImg(images) {
-  return images
-    .map(
-      ({
-        webformatURL,
-        tags,
-        likes,
-        views,
-        comments,
-        downloads,
-      }) => /*html*/ `<div class="photo-card">
-            <img class="gallery-img" src="${webformatURL}" alt="${tags}" loading="lazy" />
-            <div class="info">
-                <p class="info-item">
-                    <b>Likes: </b>${likes}
-                </p>
-                <p class="info-item">
-                    <b>Views: </b>${views}
-                 </p>
-                <p class="info-item">
-                    <b>Comments: </b>${comments}
-                </p>
-                <p class="info-item">
-                    <b>Downloads: </b>${downloads}
-                </p>
-            </div>
-        </div>`
-    )
-    .join('');
-}
+// function createMarkupImg(images) {
+//   return images
+//     .map(
+//       ({
+//         webformatURL,
+//         tags,
+//         likes,
+//         views,
+//         comments,
+//         downloads,
+//       }) => /*html*/ `<div class="photo-card">
+//             <img class="gallery-img" src="${webformatURL}" alt="${tags}" loading="lazy" />
+//             <div class="info">
+//                 <p class="info-item">
+//                     <b>Likes: </b>${likes}
+//                 </p>
+//                 <p class="info-item">
+//                     <b>Views: </b>${views}
+//                  </p>
+//                 <p class="info-item">
+//                     <b>Comments: </b>${comments}
+//                 </p>
+//                 <p class="info-item">
+//                     <b>Downloads: </b>${downloads}
+//                 </p>
+//             </div>
+//         </div>`
+//     )
+//     .join('');
+// }
