@@ -23,10 +23,6 @@ function onSubmit(e) {
 
   pixabayAPI.query = query;
 
-  // pixabayAPI.getPhotos().then(data => {
-  //   console.log(data);
-  // })
-
   pixabayAPI
     .getPhotos()
     .then(({ hits, totalHits }) => {
@@ -50,17 +46,6 @@ function onSubmit(e) {
       onError(error.message);
       clearPage();
     });
-
-  // pixabayAPI(query);
-  // pixabayAPI(query).then(data => {
-  //   // const totalImg = data.totalHits;
-  //   //  console.log('totalImg = ', totalImg);
-  //   // const hitsImg = data.hits.length;
-  //   // console.log("hitsImg = ", hitsImg)
-  //   //   console.log(data.hits[0]);
-  //   const markup = createMarkupImg(data.hits);
-  //   refs.galleryList.insertAdjacentHTML('beforeend', markup);
-  // });
 }
 
 function onClick() {
@@ -101,34 +86,3 @@ function clearPage() {
 // views - кількість переглядів.
 // comments - кількість коментарів.
 // downloads - кількість завантажень.
-
-// function createMarkupImg(images) {
-//   return images
-//     .map(
-//       ({
-//         webformatURL,
-//         tags,
-//         likes,
-//         views,
-//         comments,
-//         downloads,
-//       }) => /*html*/ `<div class="photo-card">
-//             <img class="gallery-img" src="${webformatURL}" alt="${tags}" loading="lazy" />
-//             <div class="info">
-//                 <p class="info-item">
-//                     <b>Likes: </b>${likes}
-//                 </p>
-//                 <p class="info-item">
-//                     <b>Views: </b>${views}
-//                  </p>
-//                 <p class="info-item">
-//                     <b>Comments: </b>${comments}
-//                 </p>
-//                 <p class="info-item">
-//                     <b>Downloads: </b>${downloads}
-//                 </p>
-//             </div>
-//         </div>`
-//     )
-//     .join('');
-// }
