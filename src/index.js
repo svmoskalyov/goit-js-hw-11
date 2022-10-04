@@ -1,3 +1,5 @@
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import { getRefs } from './js/getRefs';
 import { PixabayAPI } from './js/PixabayAPI';
 import { onError, onSuccess } from './js/notify';
@@ -45,7 +47,9 @@ function onClick() {
 
   if (!pixabayAPI.isShowLoadMore) {
     refs.loadMoreBtn.classList.add('is-hidden');
-    return onSuccess("We're sorry, but you've reached the end of search results.");
+    return onSuccess(
+      "We're sorry, but you've reached the end of search results."
+    );
   }
 
   pixabayAPI.getPhotos().then(({ data: { hits } }) => {
@@ -56,10 +60,18 @@ function onClick() {
 function addMarkup(photos) {
   const markup = createGalleryCards(photos);
   refs.galleryList.insertAdjacentHTML('beforeend', markup);
+  simpleLightbox();
 }
 
 function clearPage() {
   refs.galleryList.innerHTML = '';
   pixabayAPI.resetPage();
   refs.loadMoreBtn.classList.add('is-hidden');
+}
+
+function simpleLightbox() {
+  let lightbox = new SimpleLightbox('.gallery a', {
+    enableKeyboard: true,
+  });
+  lightbox.refresh();
 }
