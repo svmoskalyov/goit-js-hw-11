@@ -7,24 +7,22 @@ export class PixabayAPI {
   #query = '';
   #page = 1;
   #totalPages = 0;
-  #perPage;
-
-  constructor({ perPage = 20 } = {}) {
-    this.#perPage = perPage;
-  }
+  #perPage = 40;
+  #searchParams = {
+    params: {
+      key: '30324311-49af4374e5f205d24fc51a3b0',
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: true,
+      per_page: this.#perPage,
+    },
+  };
 
   async getPhotos() {
     try {
-      return await axios({
-        url: `/?q=${this.#query}&page=${this.#page}`,
-        params: {
-          key: '30324311-49af4374e5f205d24fc51a3b0',
-          image_type: 'photo',
-          orientation: 'horizontal',
-          safesearch: true,
-          per_page: 40,
-        },
-      });
+      const url = `/?q=${this.#query}&page=${this.#page}`;
+      const { data } = await axios.get(url, this.#searchParams);
+      return data;
     } catch (error) {
       onError(error.message);
       clearPage();

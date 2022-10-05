@@ -2,6 +2,8 @@ import { getRefs } from './js/getRefs';
 import { PixabayAPI } from './js/PixabayAPI';
 import { addMarkup } from './js/addMarkup';
 import { onError, onSuccess } from './js/notify';
+import { simpleLightbox } from './js/simpleLightbox';
+import { scrollPage } from './js/scrollPage';
 
 const refs = getRefs();
 const pixabayAPI = new PixabayAPI();
@@ -9,7 +11,7 @@ const pixabayAPI = new PixabayAPI();
 refs.form.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onClick);
 
-function onSubmit(e) {
+async function onSubmit(e) {
   e.preventDefault();
 
   const { searchQuery } = e.currentTarget.elements;
@@ -22,25 +24,25 @@ function onSubmit(e) {
 
   pixabayAPI.query = query;
 
-  pixabayAPI.getPhotos().then(({ data: { hits, totalHits } }) => {
-    if (hits.length === 0) {
-      return onError(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    }
+  const { hits, totalHits } = await pixabayAPI.getPhotos();
+  if (hits.length === 0) {
+    return onError(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  }
 
-    pixabayAPI.calculateTotalPages(totalHits);
+  pixabayAPI.calculateTotalPages(totalHits);
 
-    if (pixabayAPI.isShowLoadMore) {
-      refs.loadMoreBtn.classList.remove('is-hidden');
-    }
+  if (pixabayAPI.isShowLoadMore) {
+    refs.loadMoreBtn.classList.remove('is-hidden');
+  }
 
-    addMarkup(hits, refs.galleryList);
-    onSuccess(`Hooray! We found ${totalHits} images.`);
-  });
+  addMarkup(hits, refs.galleryList);
+  onSuccess(`Hooray! We found ${totalHits} images.`);
+  simpleLightbox();
 }
 
-function onClick() {
+async function onClick() {
   pixabayAPI.incrementPage();
 
   if (!pixabayAPI.isShowLoadMore) {
@@ -50,13 +52,14 @@ function onClick() {
     );
   }
 
-  pixabayAPI.getPhotos().then(({ data: { hits } }) => {
-    addMarkup(hits, refs.galleryList);
-  });
+  const { hits } = await pixabayAPI.getPhotos();
+  addMarkup(hits, refs.galleryList);
+  simpleLightbox().refresh();
+  scrollPage();
 }
 
 function clearPage() {
   refs.galleryList.innerHTML = '';
-  pixabayAPI.resetPage();
   refs.loadMoreBtn.classList.add('is-hidden');
+  pixabayAPI.resetPage();
 }
