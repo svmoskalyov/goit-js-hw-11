@@ -66,9 +66,6 @@ function clearPage() {
 }
 
 async function handleInfiniteScroll() {
-  // const endOfPage =
-  //   window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
-
   const endOfPage =
     window.scrollY + window.innerHeight >=
     document.documentElement.scrollHeight;
@@ -85,6 +82,3 @@ async function handleInfiniteScroll() {
     window.removeEventListener('scroll', handleInfiniteScroll);
   }
 }
-
-
-
