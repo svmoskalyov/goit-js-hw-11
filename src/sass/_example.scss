@@ -100,6 +100,7 @@ p {
 .photo-card {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   flex-basis: calc((100% - 120px) / 4);
   margin-left: 30px;
   margin-top: 30px;
@@ -110,7 +111,7 @@ p {
 }
 
 .info {
-  padding-left: 10px;
+  padding: 10px;
 }
 
 .gallery-img {
@@ -139,6 +140,7 @@ p {
   display: none;
 }
 
-.load-more:hover {
+.load-more:hover,
+.load-more:focus {
   background-color: #6250ef;
 }
