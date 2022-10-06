@@ -33,7 +33,7 @@ async function onSubmit(e) {
 
   pixabayAPI.calculateTotalPages(totalHits);
 
-  if (pixabayAPI.isShowLoadMore) {
+  if (!pixabayAPI.isShowLoadMore) {
     refs.loadMoreBtn.classList.remove('is-hidden');
   }
 
@@ -46,17 +46,15 @@ async function onSubmit(e) {
 async function onClick() {
   pixabayAPI.incrementPage();
 
-  if (!pixabayAPI.isShowLoadMore) {
-    refs.loadMoreBtn.classList.add('is-hidden');
-    return onInfo(
-      "We're sorry, but you've reached the end of search results."
-    );
-  }
-
   const { hits } = await pixabayAPI.getPhotos();
   addMarkup(hits, refs.galleryList);
   simpleLightbox().refresh();
   scrollPage();
+
+  if (pixabayAPI.isShowLoadMore) {
+    refs.loadMoreBtn.classList.add('is-hidden');
+    return onInfo("We're sorry, but you've reached the end of search results.");
+  }
 }
 
 function clearPage() {

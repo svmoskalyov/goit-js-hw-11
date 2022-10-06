@@ -38,7 +38,7 @@ export class PixabayAPI {
   }
 
   get isShowLoadMore() {
-    return this.#page < this.#totalPages;
+    return this.#page === this.#totalPages;
   }
 
   calculateTotalPages(totalPhotos) {
