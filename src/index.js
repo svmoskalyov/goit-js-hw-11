@@ -1,7 +1,7 @@
 import { getRefs } from './js/getRefs';
 import { PixabayAPI } from './js/PixabayAPI';
 import { addMarkup } from './js/addMarkup';
-import { onError, onSuccess } from './js/notify';
+import { onError, onInfo, onSuccess } from './js/notify';
 import { simpleLightbox } from './js/simpleLightbox';
 import { scrollPage } from './js/scrollPage';
 
@@ -48,7 +48,7 @@ async function onClick() {
 
   if (!pixabayAPI.isShowLoadMore) {
     refs.loadMoreBtn.classList.add('is-hidden');
-    return onSuccess(
+    return onInfo(
       "We're sorry, but you've reached the end of search results."
     );
   }

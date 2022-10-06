@@ -11,3 +11,9 @@ export function onSuccess(message) {
     position: 'right-top',
   });
 }
+
+export function onInfo(message) {
+  Notify.info(message, {
+    position: 'right-top',
+  });
+}
